@@ -8,15 +8,15 @@
 
 </head>
 <body>
-    <h1>Sudoku</h1>
-    <hr>
-    <h2 id="errors">0</h2>
-
-    <table id="board"></table>
-    <div id="digits"></div>
-
     <div class="container">
-    <button class="generateBtn" onclick="generateSudoku()">Generate Sudoku</button>
+        <h1>Sudoku</h1>
+        <hr>
+        <h2 id="errors">Errors: 0</h2>
+        <div class="board-wrapper">
+            <table id="board"></table>
+        </div>
+        <div id="digits"></div>
+        <button class="generateBtn" onclick="generateSudoku()">🎲 New Sudoku</button>
     </div>
      
     <script src="script.js"></script>

@@ -1,5 +1,9 @@
 let table = document.getElementById("board");
+let digitsContainer = document.getElementById("digits");
 let sudokuBoard = [];
+let solvedSudoku = [];
+let selectedCell = null;
+let errorCount = 0;
 
 function createSudokuBoard() {
     table.innerHTML = "";
@@ -12,6 +16,10 @@ function createSudokuBoard() {
 
             if (sudokuBoard[row][col] === 0) {
                 td.textContent = "";
+                td.classList.add("editable");
+                td.addEventListener("click", function () {
+                    selectCell(td, row, col);
+                });
             } else {
                 td.textContent = sudokuBoard[row][col];
             }
@@ -19,6 +27,80 @@ function createSudokuBoard() {
             tr.appendChild(td);
         }
         table.appendChild(tr);
+    }
+}
+
+function createDigits() {
+    digitsContainer.innerHTML = "";
+
+    for(let num=1; num<=9; num++){
+        let digit = document.createElement("div");
+        digit.textContent = num;
+        digit.classList.add("digit");
+
+        digit.addEventListener("click", function() {
+            placeNumber(num);
+        });
+
+        digitsContainer.appendChild(digit);
+    }
+}
+
+function selectCell(td, row, col) {
+    if (selectedCell) {
+        selectedCell.classList.remove("selected");
+    }
+
+    selectedCell = td;
+    selectedCell.classList.add("selected");
+    selectedCell.dataset.row = row;
+    selectedCell.dataset.col = col;
+}
+
+function placeNumber(num) {
+    if (selectedCell) {
+        let row = selectedCell.dataset.row;
+        let col = selectedCell.dataset.col;
+
+        if (solvedSudoku[row][col] === num) {
+            sudokuBoard[row][col] = num;
+            selectedCell.textContent = num;
+            selectedCell.style.color = 'green';
+
+        } else {
+            sudokuBoard[row][col] = num;
+            selectedCell.textContent = num;
+            selectedCell.style.color = 'red';
+
+            incrementErrors();
+        }
+
+        selectedCell.classList.remove("selected");
+        selectedCell = null;
+
+        if (isSudokuComplete()) {
+            alert("Congratulations! You have solved the Sudoku!")
+        }
+
+    }
+}
+function isSudokuComplete() {
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            if (sudokuBoard[row][col] !== solvedSudoku[row][col]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function incrementErrors() {
+    errorCount++;
+
+    let errorDisplay = document.getElementById("errors");
+    if(errorDisplay) {
+        errorDisplay.textContent = `Errors: ${errorCount}`;
     }
 }
 
@@ -71,6 +153,21 @@ function solveSudoku(sudokuBoard) {
     return true;
 }
 
+function removeNumbers(count) {
+    let numErased = 0;
+
+    while (numErased < count) {
+        let row = Math.floor(Math.random() * 9);
+        let col = Math.floor(Math.random() * 9);
+
+        if (sudokuBoard[row][col] != 0) {
+            sudokuBoard[row][col] = 0;
+            numErased++;
+        }
+    }
+
+    createSudokuBoard();
+}
 
 function generateSudoku() {
     for (let i=0; i<9; i++) {
@@ -90,7 +187,9 @@ function generateSudoku() {
    
     solveSudoku(sudokuBoard);
 
-    createSudokuBoard();
+    solvedSudoku = sudokuBoard.map(row => [...row]);
     
+    removeNumbers(40);
+    createDigits();
     
 }
